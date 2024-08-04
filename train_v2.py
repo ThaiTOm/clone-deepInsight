@@ -5,7 +5,7 @@ from datetime import datetime
 
 import numpy as np
 import torch
-from dataset import get_dataloader
+from dataset_kaggle import get_dataloader
 from losses import CombinedMarginLoss
 from lr_scheduler import PolynomialLRWarmup
 from partial_fc_v2 import PartialFC_V2
@@ -203,7 +203,7 @@ def main(args):
     start_epoch = 0
     global_step = 0
     if cfg.resume:
-        dict_checkpoint = torch.load(os.path.join(cfg.output, f"checkpoint_gpu_0.pt"), map_location="cpu")
+        dict_checkpoint = torch.load("/kaggle/input/", map_location="cpu")
         start_epoch = dict_checkpoint["epoch"]
         global_step = dict_checkpoint["global_step"]
         backbone.module.load_state_dict(dict_checkpoint["state_dict_backbone"])
