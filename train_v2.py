@@ -81,10 +81,6 @@ class Backbone(nn.Module):
             else:
                 param.requires_grad = True
 
-        # Optional: Print the parameter names and their requires_grad status for verification
-        for name, param in backbone.named_parameters():
-            print(f'{name}: {param.requires_grad}')
-
         self.backbone = backbone
         self.emb = nn.Linear(hidden_size, 1024, bias=False)
         self.dropout = Multisample_Dropout()
@@ -150,6 +146,8 @@ def main(args):
 
     backbone = Backbone(1024)
 
+    print("The backbone is finished initializing.")
+
     backbone.cuda()
 
     backbone = torch.nn.parallel.DistributedDataParallel(
@@ -203,7 +201,7 @@ def main(args):
     start_epoch = 0
     global_step = 0
     if cfg.resume:
-        dict_checkpoint = torch.load("/kaggle/input/", map_location="cpu")
+        dict_checkpoint = torch.load("/kaggle/input/embedding-model/pytorch/stable-version/1/checkpoint_gpu_stable.pt", map_location="cpu")
         start_epoch = dict_checkpoint["epoch"]
         global_step = dict_checkpoint["global_step"]
         backbone.module.load_state_dict(dict_checkpoint["state_dict_backbone"])
