@@ -69,7 +69,7 @@ class Backbone(nn.Module):
         param_names = [name for name, _ in backbone.named_parameters()]
 
         # Calculate the index to split the parameters (freeze 2/3 of the model)
-        split_index = int(len(param_names) * 5 / 6)
+        split_index = int(len(param_names) * 3 / 4)
 
         # Identify the layers to be frozen
         frozen_layer_names = param_names[:split_index]
@@ -80,6 +80,17 @@ class Backbone(nn.Module):
                 param.requires_grad = False
             else:
                 param.requires_grad = True
+
+        idxs = [1, 2]
+        if not isinstance(idxs, Iterable):
+            idxs = [idxs]
+        num_child = len(list(model.children()))
+        idxs = tuple(map(lambda idx: num_child + idx if idx < 0 else idx, idxs))
+        for idx, child in enumerate(backbone.children()):
+            if idx not in idxs:
+                continue
+            for param in child.parameters():
+                param.requires_grad = not True
 
         self.backbone = backbone
         self.emb = nn.Linear(hidden_size, 1024, bias=False)
