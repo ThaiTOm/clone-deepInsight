@@ -76,22 +76,22 @@ class Backbone(nn.Module):
         frozen_layer_names = param_names[:split_index]
 
         # Set requires_grad to False for the first 2/3 of the layers
-        for name, param in backbone.named_parameters():
-            if name in frozen_layer_names:
-                param.requires_grad = False
-            else:
-                param.requires_grad = True
+        # for name, param in backbone.named_parameters():
+        #     if name in frozen_layer_names:
+        #         param.requires_grad = False
+        #     else:
+        #         param.requires_grad = True
 
-        idxs = [1, 2]
-        if not isinstance(idxs, Iterable):
-            idxs = [idxs]
-        num_child = len(list(backbone.children()))
-        idxs = tuple(map(lambda idx: num_child + idx if idx < 0 else idx, idxs))
-        for idx, child in enumerate(backbone.children()):
-            if idx not in idxs:
-                continue
-            for param in child.parameters():
-                param.requires_grad = not True
+        # idxs = [1, 2]
+        # if not isinstance(idxs, Iterable):
+        #     idxs = [idxs]
+        # num_child = len(list(backbone.children()))
+        # idxs = tuple(map(lambda idx: num_child + idx if idx < 0 else idx, idxs))
+        # for idx, child in enumerate(backbone.children()):
+        #     if idx not in idxs:
+        #         continue
+        #     for param in child.parameters():
+        #         param.requires_grad = not True
 
         self.backbone = backbone
         self.emb = nn.Linear(hidden_size, 1024, bias=False)
