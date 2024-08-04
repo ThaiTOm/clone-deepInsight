@@ -34,8 +34,8 @@ class CustomDataset(Dataset):
                     self.images_dir.append(image_dir)
                     self.labels.append(int(label))
         label = len(set(self.labels))
-        for idx, folder_name in enumerate(os.listdir("/kaggle/input/dataCollection/dataCollection/")):
-            folder_name = f"/kaggle/input/dataCollection/dataCollection/{folder_name}"
+        for idx, folder_name in enumerate(os.listdir("/kaggle/input/datasetcollection/dataCollection")):
+            folder_name = f"/kaggle/input/datasetcollection/dataCollection/{folder_name}"
             ext = os.listdir(folder_name)[0].split(".")[-1]
             file_name = "augmented_image"
             for i in range(1, 51):
@@ -102,6 +102,10 @@ def get_dataloader(
 ) -> Iterable:
     blur = A.AdvancedBlur(
         blur_limit=(3, 15),  # ScaleIntType
+        sigma_x_limit=(0.2, 1.0),  # ScaleFloatType
+        sigma_y_limit=(0.2, 1.0),  # ScaleFloatType
+        sigmaX_limit=None,  # ScaleFloatType | None
+        sigmaY_limit=None,  # ScaleFloatType | None
         rotate_limit=90,  # ScaleIntType
         beta_limit=(0.5, 8.0),  # ScaleFloatType
         noise_limit=(0.9, 1.1),  # ScaleFloatType
@@ -123,6 +127,7 @@ def get_dataloader(
         fit_output=False,  # bool
         keep_ratio=False,  # bool
         rotate_method="largest_box",  # Literal['largest_box', 'ellipse']
+        balanced_scale=False,  # bool
         always_apply=None,  # bool | None
         p=1.0,  # float
     )
