@@ -69,7 +69,7 @@ class Backbone(nn.Module):
         param_names = [name for name, _ in backbone.named_parameters()]
 
         # Calculate the index to split the parameters (freeze 2/3 of the model)
-        split_index = int(len(param_names) * 2 / 3)
+        split_index = int(len(param_names) * 5 / 6)
 
         # Identify the layers to be frozen
         frozen_layer_names = param_names[:split_index]
