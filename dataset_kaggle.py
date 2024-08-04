@@ -123,7 +123,6 @@ def get_dataloader(
         fit_output=False,  # bool
         keep_ratio=False,  # bool
         rotate_method="largest_box",  # Literal['largest_box', 'ellipse']
-        balanced_scale=False,  # bool
         always_apply=None,  # bool | None
         p=1.0,  # float
     )
