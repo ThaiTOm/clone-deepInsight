@@ -7,7 +7,7 @@ from easydict import EasyDict as edict
 config = edict()
 config.margin_list = (1.0, 0.5, 0.0)
 config.network = "r50"
-config.resume = False
+config.resume = True
 config.output = None
 config.embedding_size = 1024
 config.sample_rate = 1.0
@@ -34,5 +34,4 @@ config.wandb_project = "FirstTime"
 config.num_workers = 1
 config.frequent = 50
 config.save_all_states = True
-config.resume = True
 config.kaggle_dir = True
