@@ -17,6 +17,7 @@ from utils.utils_config import get_config
 from utils.utils_distributed_sampler import setup_seed
 from utils.utils_logging import AverageMeter, init_logging
 from torch.distributed.algorithms.ddp_comm_hooks.default_hooks import fp16_compress_hook
+from collections.abc import Iterable
 
 assert torch.__version__ >= "1.12.0", "In order to enjoy the features of the new torch, \
 we have upgraded the torch to 1.12.0. torch before than 1.12.0 may not work in the future."
