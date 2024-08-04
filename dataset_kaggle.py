@@ -102,8 +102,6 @@ def get_dataloader(
 ) -> Iterable:
     blur = A.AdvancedBlur(
         blur_limit=(3, 15),  # ScaleIntType
-        sigmaX_limit=None,  # ScaleFloatType | None
-        sigmaY_limit=None,  # ScaleFloatType | None
         rotate_limit=90,  # ScaleIntType
         beta_limit=(0.5, 8.0),  # ScaleFloatType
         noise_limit=(0.9, 1.1),  # ScaleFloatType
