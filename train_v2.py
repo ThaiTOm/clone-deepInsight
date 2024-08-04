@@ -85,7 +85,7 @@ class Backbone(nn.Module):
         idxs = [1, 2]
         if not isinstance(idxs, Iterable):
             idxs = [idxs]
-        num_child = len(list(model.children()))
+        num_child = len(list(backbone.children()))
         idxs = tuple(map(lambda idx: num_child + idx if idx < 0 else idx, idxs))
         for idx, child in enumerate(backbone.children()):
             if idx not in idxs:
