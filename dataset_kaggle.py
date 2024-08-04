@@ -70,7 +70,7 @@ class CustomDataset(Dataset):
 
         if not os.path.isdir(img_path) and os.path.exists(img_path):
             try:
-                iccFileFixed(img_path)
+                # iccFileFixed(img_path)
                 image = cv2.imread(img_path)
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             except Exception as e:
@@ -82,7 +82,7 @@ class CustomDataset(Dataset):
         else:
             img_path = os.path.join(img_path, os.listdir(img_path)[0])
             try:
-                iccFileFixed(img_path)
+                # iccFileFixed(img_path)
                 image = cv2.imread(img_path)
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             except Exception as e:
@@ -90,7 +90,7 @@ class CustomDataset(Dataset):
                     f"Error opening image: {img_path}. {str(e)}. The default path is {self.images_dir[idx]}, we got {os.listdir(img_path)}"))
                 img_path = "/kaggle/input/myfolder/content/all/train/class1681/qr125_jpg.rf.68be0b0e1167e631aa7b6f830f1de1ca33.jpg"
                 label = 1
-                iccFileFixed(img_path)
+                # iccFileFixed(img_path)
                 image = cv2.imread(img_path)
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
