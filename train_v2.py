@@ -100,7 +100,7 @@ class Backbone(nn.Module):
 
         # Set requires_grad to False for the first 2/3 of the layers
         for name, param in backbone.named_parameters():
-            if name in frozen_layer_names:
+            if "ln_post" not in name:
                 param.requires_grad = False
             else:
                 param.requires_grad = True
