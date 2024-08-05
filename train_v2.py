@@ -86,7 +86,9 @@ class Backbone(nn.Module):
                           zip(current_model_dict.keys(), dict_checkpoint.values())}
 
         backbone.load_state_dict(new_state_dict, strict=False)
-
+        del dict_checkpoint
+        import gc
+        gc.collect()
         # # Collect the names of all parameters
         # param_names = [name for name, _ in backbone.named_parameters()]
         #
