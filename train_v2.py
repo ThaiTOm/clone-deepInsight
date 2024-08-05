@@ -89,21 +89,21 @@ class Backbone(nn.Module):
         del dict_checkpoint
         import gc
         gc.collect()
-        # # Collect the names of all parameters
-        # param_names = [name for name, _ in backbone.named_parameters()]
-        #
-        # # Calculate the index to split the parameters (freeze 2/3 of the model)
-        # split_index = int(len(param_names) * 3 / 4)
-        #
-        # # Identify the layers to be frozen
-        # frozen_layer_names = param_names[:split_index]
+        # Collect the names of all parameters
+        param_names = [name for name, _ in backbone.named_parameters()]
+
+        # Calculate the index to split the parameters (freeze 2/3 of the model)
+        split_index = int(len(param_names) * 3 / 4)
+
+        # Identify the layers to be frozen
+        frozen_layer_names = param_names[:split_index]
 
         # Set requires_grad to False for the first 2/3 of the layers
-        # for name, param in backbone.named_parameters():
-        #     if name in frozen_layer_names:
-        #         param.requires_grad = False
-        #     else:
-        #         param.requires_grad = True
+        for name, param in backbone.named_parameters():
+            if name in frozen_layer_names:
+                param.requires_grad = False
+            else:
+                param.requires_grad = True
 
         # idxs = [1, 2]
         # if not isinstance(idxs, Iterable):
