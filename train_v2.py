@@ -44,6 +44,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
+def get_module(state, str_default="module"):
+    new_state_dict = {}
+    for k, v in state.items():
+        if k.startswith(str_default):
+            new_state_dict[k[7:]] = v  # remove 'module.'
+        else:
+            new_state_dict[k] = v
+
+    return new_state_dict
 
 class Multisample_Dropout(nn.Module):
     def __init__(self):
@@ -66,8 +75,17 @@ class Backbone(nn.Module):
 
         backbone = backbone.visual
 
-        dict_checkpoint = torch.load("/kaggle/input/embedding-model/pytorch/stable-version/1/checkpoint_gpu_stable.pt", map_location="cpu")
-        backbone.module.load_state_dict(dict_checkpoint["state_dict_backbone"])
+        dict_checkpoint = torch.load("/kaggle/input/embedding-model/pytorch/stable-version/1/checkpoint_gpu_stable.pt", map_location="cpu")["state_dict_backbone"]
+        # backbone.module.load_state_dict(dict_checkpoint)
+
+        current_model_dict = backbone.state_dict()
+        # print(current_model_dict.keys() == state_dict.keys())
+        # Create a new state dictionary without the first three layers
+
+        new_state_dict = {k: v if v.size() == current_model_dict[k].size() else current_model_dict[k] for k, v in
+                          zip(current_model_dict.keys(), dict_checkpoint.values())}
+
+        backbone.load_state_dict(new_state_dict, strict=False)
 
         # # Collect the names of all parameters
         # param_names = [name for name, _ in backbone.named_parameters()]
