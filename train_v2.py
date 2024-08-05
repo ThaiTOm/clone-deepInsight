@@ -66,14 +66,17 @@ class Backbone(nn.Module):
 
         backbone = backbone.visual
 
-        # Collect the names of all parameters
-        param_names = [name for name, _ in backbone.named_parameters()]
+        dict_checkpoint = torch.load("/kaggle/input/embedding-model/pytorch/stable-version/1/checkpoint_gpu_stable.pt", map_location="cpu")
+        backbone.module.load_state_dict(dict_checkpoint["state_dict_backbone"])
 
-        # Calculate the index to split the parameters (freeze 2/3 of the model)
-        split_index = int(len(param_names) * 3 / 4)
-
-        # Identify the layers to be frozen
-        frozen_layer_names = param_names[:split_index]
+        # # Collect the names of all parameters
+        # param_names = [name for name, _ in backbone.named_parameters()]
+        #
+        # # Calculate the index to split the parameters (freeze 2/3 of the model)
+        # split_index = int(len(param_names) * 3 / 4)
+        #
+        # # Identify the layers to be frozen
+        # frozen_layer_names = param_names[:split_index]
 
         # Set requires_grad to False for the first 2/3 of the layers
         # for name, param in backbone.named_parameters():
@@ -139,7 +142,7 @@ def main(args):
                 sync_tensorboard=True,
                 resume=cfg.wandb_resume,
                 name=run_name,
-                notes=cfg.notes) if rank == 0 or cfg.wandb_log_all else None
+                ) if rank == 0 or cfg.wandb_log_all else None
             if wandb_logger:
                 wandb_logger.config.update(cfg)
         except Exception as e:
