@@ -34,5 +34,5 @@ config.wandb_project = "FirstTime"
 config.num_workers = 1
 config.frequent = 50
 config.save_all_states = True
-config.resume = True
+config.resume = False
 config.kaggle_dir = True
