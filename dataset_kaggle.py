@@ -107,7 +107,7 @@ def get_dataloader(
         dali=False,
         dali_aug=False,
         seed=2048,
-        num_workers=2,
+        num_workers=4,
 ) -> Iterable:
     blur = A.AdvancedBlur(
         blur_limit=(3, 15),  # ScaleIntType
@@ -186,17 +186,17 @@ def get_dataloader(
     )
 
     transform = A.Compose([
-        A.HorizontalFlip(p=0.5),
-        A.VerticalFlip(p=0.5),
-        A.RandomBrightnessContrast(p=0.5),
-        A.Rotate(limit=180, p=1),
-        blur,
-        CLAHE,
-        affine,
-        elasticTransform,
-        noise,
-        compression,
-        sharpen,
+        # A.HorizontalFlip(p=0.5),
+        # A.VerticalFlip(p=0.5),
+        # A.RandomBrightnessContrast(p=0.5),
+        # A.Rotate(limit=180, p=1),
+        # blur,
+        # CLAHE,
+        # affine,
+        # elasticTransform,
+        # noise,
+        # compression,
+        # sharpen,
         A.LongestMaxSize(max_size=224, interpolation=3),
         A.PadIfNeeded(min_height=224, min_width=224, border_mode=0, value=(0, 0, 0)),
         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
