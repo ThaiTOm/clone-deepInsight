@@ -19,6 +19,10 @@ import random
 from PIL import Image
 import cv2
 
+def iccFileFixed(image_path):
+    img = Image.open(image_path)
+    img.info.pop('icc_profile', None)
+    img.save(image_path)
 
 class CustomDataset(Dataset):
     def __init__(self, data_file, transform):
@@ -29,9 +33,9 @@ class CustomDataset(Dataset):
         with open(data_file, 'r', encoding='utf-8') as f:
             for line in f:
                 image_dir, label = line.strip().split('\t')
+
                 image_dir = image_dir.replace("/kaggle", "kaggle")
                 if "dataCollection" not in image_dir:
-                    # image_dir = image_dir.replace("dataCollection", "dataCollection/dataCollection")
                     self.images_dir.append(image_dir)
                     self.labels.append(int(label))
         label = len(set(self.labels))
@@ -65,6 +69,7 @@ class CustomDataset(Dataset):
 
         if not os.path.isdir(img_path) and os.path.exists(img_path):
             try:
+                iccFileFixed(img_path)
                 image = cv2.imread(img_path)
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             except Exception as e:
@@ -76,6 +81,7 @@ class CustomDataset(Dataset):
         else:
             img_path = os.path.join(img_path, os.listdir(img_path)[0])
             try:
+                iccFileFixed(img_path)
                 image = cv2.imread(img_path)
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             except Exception as e:
@@ -83,6 +89,7 @@ class CustomDataset(Dataset):
                     f"Error opening image: {img_path}. {str(e)}. The default path is {self.images_dir[idx]}, we got {os.listdir(img_path)}"))
                 img_path = "kaggle/input/myfolder/content/all/train/class1681/qr125_jpg.rf.68be0b0e1167e631aa7b6f830f1de1ca33.jpg"
                 label = 1
+                iccFileFixed(img_path)
                 image = cv2.imread(img_path)
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -177,6 +184,41 @@ def get_dataloader(
         p=1.0,  # float
     )
 
+    ringingShoot = A.RingingOvershoot(
+        blur_limit=(2, 15),  # ScaleIntType
+        cutoff=(0.7853981633974483, 1.5707963267948966),  # ScaleFloatType
+        always_apply=None,  # bool | None
+        p=0.5,  # float
+    )
+
+    sunFlare = A.RandomSunFlare(
+        flare_roi=(0, 0, 1, 0.5),  # tuple[float, float, float, float]
+        angle_lower=None,  # float | None
+        angle_upper=None,  # float | None
+        num_flare_circles_lower=None,  # int | None
+        num_flare_circles_upper=None,  # int | None
+        src_radius=250,  # int
+        src_color=(255, 255, 255),  # tuple[int, ...]
+        angle_range=(0, 1),  # tuple[float, float]
+        num_flare_circles_range=(6, 10),  # tuple[int, int]
+        always_apply=None,  # bool | None
+        p=0.8,  # float
+    )
+
+    randomRain = A.RandomRain(
+        slant_lower=None,  # int | None
+        slant_upper=None,  # int | None
+        slant_range=(-5, 5),  # tuple[int, int]
+        drop_length=10,  # int
+        drop_width=1,  # int
+        drop_color=(200, 200, 200),  # tuple[int, int, int]
+        blur_value=4,  # int
+        brightness_coefficient=0.7,  # float
+        rain_type=None,  # RainMode | None
+        always_apply=None,  # bool | None
+        p=0.2,  # float
+    )
+
     transform = A.Compose([
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.5),
@@ -187,8 +229,12 @@ def get_dataloader(
         affine,
         elasticTransform,
         noise,
+        ringingShoot,
+        sunFlare,
         compression,
         sharpen,
+        randomRain,
+
         A.LongestMaxSize(max_size=224, interpolation=3),
         A.PadIfNeeded(min_height=224, min_width=224, border_mode=0, value=(0, 0, 0)),
         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
