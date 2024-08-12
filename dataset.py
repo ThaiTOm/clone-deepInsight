@@ -67,6 +67,19 @@ class CustomDataset(Dataset):
         img_path = self.images_dir[idx]
         label = self.labels[idx]
 
+        if os.path.getsize(img_path) == 0:
+            print("We got a corrupt file ", img_path)
+            img_path = "kaggle/input/myfolder/content/all/train/class1681/qr125_jpg.rf.68be0b0e1167e631aa7b6f830f1de1ca33.jpg"
+            label = 1
+            iccFileFixed(img_path)
+            image = cv2.imread(img_path)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+            if self.transform:
+                image = self.transform(image=image)["image"]
+
+            return image, label
+
         if not os.path.isdir(img_path) and os.path.exists(img_path):
             try:
                 iccFileFixed(img_path)
@@ -185,7 +198,7 @@ def get_dataloader(
     )
 
     ringingShoot = A.RingingOvershoot(
-        blur_limit=(2, 15),  # ScaleIntType
+        blur_limit=(3, 15),  # ScaleIntType
         cutoff=(0.7853981633974483, 1.5707963267948966),  # ScaleFloatType
         always_apply=None,  # bool | None
         p=0.5,  # float
@@ -216,10 +229,29 @@ def get_dataloader(
         brightness_coefficient=0.7,  # float
         rain_type=None,  # RainMode | None
         always_apply=None,  # bool | None
-        p=0.2,  # float
+        p=0.4,  # float
+    )
+
+    randomShadow = A.RandomShadow(
+        shadow_roi=(0, 0.5, 1, 1),  # tuple[float, float, float, float]
+        num_shadows_limit=(1, 2),  # tuple[int, int]
+        num_shadows_lower=None,  # int | None
+        num_shadows_upper=None,  # int | None
+        shadow_dimension=5,  # int
+        always_apply=None,  # bool | None
+        p=1.0,  # float
+    )
+
+    defocus = A.Defocus(
+        radius=(8, 9),  # ScaleIntType
+        alias_blur=(0.1, 0.5),  # ScaleFloatType
+        always_apply=None,  # bool | None
+        p=1.0,  # float
     )
 
     transform = A.Compose([
+        A.LongestMaxSize(max_size=224, interpolation=3),
+        A.PadIfNeeded(min_height=224, min_width=224, border_mode=0, value=(0, 0, 0)),
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.5),
         A.RandomBrightnessContrast(p=0.5),
@@ -233,15 +265,14 @@ def get_dataloader(
         sunFlare,
         compression,
         sharpen,
+        randomShadow,
+        defocus,
         randomRain,
-
-        A.LongestMaxSize(max_size=224, interpolation=3),
-        A.PadIfNeeded(min_height=224, min_width=224, border_mode=0, value=(0, 0, 0)),
         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ToTensorV2()
     ])
 
-    train_set = CustomDataset(data_file='kaggle/input/product-vietnamese/data.txt', transform=transform)
+    train_set = CustomDataset(data_file='kaggle/working/data.txt', transform=transform)
 
     rank, world_size = get_dist_info()
     train_sampler = DistributedSampler(
@@ -262,6 +293,7 @@ def get_dataloader(
         drop_last=True,
         worker_init_fn=init_fn,
     )
+
 
     return train_loader
 

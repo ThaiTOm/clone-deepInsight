@@ -5,7 +5,7 @@ from datetime import datetime
 
 import numpy as np
 import torch
-from dataset_kaggle import get_dataloader
+from dataset import get_dataloader
 from losses import CombinedMarginLoss
 from lr_scheduler import PolynomialLRWarmup
 from partial_fc_v2 import PartialFC_V2
@@ -75,7 +75,7 @@ class Backbone(nn.Module):
 
         backbone = backbone.visual
 
-        dict_checkpoint = torch.load("/kaggle/input/embedding-model/pytorch/stable-version/1/checkpoint_gpu_stable.pt", map_location="cpu")["state_dict_backbone"]
+        dict_checkpoint = torch.load("kaggle/input/checkpoint_gpu_stable.pt", map_location="cpu")["state_dict_backbone"]
         # backbone.module.load_state_dict(dict_checkpoint)
 
         current_model_dict = backbone.state_dict()
@@ -100,10 +100,10 @@ class Backbone(nn.Module):
 
         # Set requires_grad to False for the first 2/3 of the layers
         for name, param in backbone.named_parameters():
-            if "ln_post" not in name:
-                param.requires_grad = False
-            else:
-                param.requires_grad = True
+            # if "ln_post" not in name:
+            param.requires_grad = False
+            # else:
+            #     param.requires_grad = True
 
         # idxs = [1, 2]
         # if not isinstance(idxs, Iterable):
@@ -236,7 +236,7 @@ def main(args):
     start_epoch = 0
     global_step = 0
     if cfg.resume:
-        dict_checkpoint = torch.load("/kaggle/input/embedding-model/pytorch/stable-version/1/checkpoint_gpu_stable.pt", map_location="cpu")
+        dict_checkpoint = torch.load("checkpoint.pt", map_location="cpu")
         start_epoch = dict_checkpoint["epoch"]
         global_step = dict_checkpoint["global_step"]
         backbone.module.load_state_dict(dict_checkpoint["state_dict_backbone"])
