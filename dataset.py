@@ -249,25 +249,44 @@ def get_dataloader(
         p=1.0,  # float
     )
 
-    transform = A.Compose([
+   transform = A.Compose([
         A.LongestMaxSize(max_size=224, interpolation=3),
-        A.PadIfNeeded(min_height=224, min_width=224, border_mode=0, value=(0, 0, 0)),
-        A.HorizontalFlip(p=0.5),
-        A.VerticalFlip(p=0.5),
-        A.RandomBrightnessContrast(p=0.5),
-        A.Rotate(limit=180, p=1),
-        blur,
-        CLAHE,
-        affine,
-        elasticTransform,
-        noise,
-        ringingShoot,
-        sunFlare,
-        compression,
-        sharpen,
-        randomShadow,
-        defocus,
-        randomRain,
+        # A.PadIfNeeded(min_height=224, min_width=224, border_mode=0, value=(0, 0, 0)),
+        A.RandomSunFlare(
+            flare_roi=(0, 0, 1, 0.5),  # Sun flare at the top of the image
+            angle_lower=None,
+            angle_upper=None,
+            num_flare_circles_lower=None,
+            num_flare_circles_upper=None,
+            src_radius=50,
+            src_color=(255, 255, 255),  # Flare color (white)
+            angle_range=(0, 1),  # Flare angle range
+            num_flare_circles_range=(2, 3),  # Number of flare circles
+            p=1,  # Probability of applying the effect
+        ),
+        A.ImageCompression(
+            compression_type="jpeg",  # JPEG compression
+            quality_range=(30, 40),  # Quality range for compression
+            p=.5,  # Probability of applying the effect
+        ),
+        A.Sharpen(
+            alpha=(0.1, 0.2),  # Sharpening factor
+            lightness=(0.5, 0.6),  # Lightness of the sharpen effect
+            p=.5,  # Probability of applying the effect
+        ),
+        A.Defocus(
+            radius=(1, 2),  # Defocus radius
+            alias_blur=(0.8, 0.9),  # Alias blur amount
+            p=.5,  # Probability of applying the effect
+        ),
+        A.RandomRain(
+            drop_length=20,  # Length of the rain drops
+            drop_width=1,  # Width of the rain drops
+            drop_color=(200, 200, 200),  # Rain color (light grey)
+            blur_value=1,  # Apply blur to the rain
+            brightness_coefficient=0.7,  # Brightness adjustment for the rain
+            p=0,  # Probability of applying the effect
+        ),
         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ToTensorV2()
     ])
